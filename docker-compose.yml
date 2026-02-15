@@ -14,7 +14,7 @@ services:
     volumes:
       - ./storage/docker/db:/var/lib/mysql
     networks:
-      - ${CONTAINER_NAME}-db-network
+      - db-network
 
   app:
     build:
@@ -31,8 +31,8 @@ services:
     depends_on:
       - db
     networks:
-      - ${CONTAINER_NAME}-db-network
-      - ${CONTAINER_NAME}-webserver-network
+      - db-network
+      - webserver-network
 
   webserver:
     image: nginx:1.21.4-alpine
@@ -45,8 +45,10 @@ services:
     ports:
       - "80:80"
     networks:
-      - ${CONTAINER_NAME}-webserver-network
+      - webserver-network
 
 networks:
-  ${CONTAINER_NAME}-db-network:
-  ${CONTAINER_NAME}-webserver-network:
+  db-network:
+    name: ${CONTAINER_NAME}-db-network
+  webserver-network:
+    name: ${CONTAINER_NAME}-webserver-network
