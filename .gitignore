@@ -18,6 +18,7 @@
 /public/storage
 /storage/*
 !/storage/.gitignore
+/storage/docker/
 /vendor
 /.claude/
 .firstrun

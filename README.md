@@ -40,6 +40,11 @@ git push -u origin main
 ### 3. Запуск контейнерів
 
 ```bash
+# Створюємо .env
+cp .env.example .env
+
+# Відредагуйте CONTAINER_NAME в .env файлі
+
 # Піднімаємо контейнери
 docker compose up -d
 

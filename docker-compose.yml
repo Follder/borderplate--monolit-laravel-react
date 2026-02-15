@@ -2,7 +2,7 @@ services:
   db:
     image: mysql:8.0
     platform: linux/x86_64
-    container_name: yaremche-db
+    container_name: ${CONTAINER_NAME}-db
     restart: always
     ports:
       - "3306:3306"
@@ -14,13 +14,13 @@ services:
     volumes:
       - ./storage/docker/db:/var/lib/mysql
     networks:
-      - yaremche-db-network
+      - ${CONTAINER_NAME}-db-network
 
   app:
     build:
       context: ./
       dockerfile: ./docker/php/Dockerfile
-    container_name: yaremche-app
+    container_name: ${CONTAINER_NAME}-app
     restart: unless-stopped
     working_dir: /var/www/
     volumes:
@@ -31,12 +31,12 @@ services:
     depends_on:
       - db
     networks:
-      - yaremche-db-network
-      - yaremche-webserver-network
+      - ${CONTAINER_NAME}-db-network
+      - ${CONTAINER_NAME}-webserver-network
 
   webserver:
     image: nginx:1.21.4-alpine
-    container_name: yaremche-webserver
+    container_name: ${CONTAINER_NAME}-webserver
     restart: unless-stopped
     volumes:
       - ./:/var/www
@@ -45,8 +45,8 @@ services:
     ports:
       - "80:80"
     networks:
-      - yaremche-webserver-network
+      - ${CONTAINER_NAME}-webserver-network
 
 networks:
-  yaremche-db-network:
-  yaremche-webserver-network:
+  ${CONTAINER_NAME}-db-network:
+  ${CONTAINER_NAME}-webserver-network:
