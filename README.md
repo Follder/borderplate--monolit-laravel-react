@@ -83,7 +83,6 @@ php artisan make:filament-user
 
 ```bash
 # PHPStan
-```bash
 docker compose exec -t app  ./vendor/bin/phpstan analyse
 
 # TypeScript перевірка
