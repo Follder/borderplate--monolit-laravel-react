@@ -1,0 +1,7 @@
+storage/docker/db
+storage/docker/redis
+storage
+vendor
+node_modules
+.git
+.env

@@ -1,0 +1,15 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
+
+parameters:
+    treatPhpDocTypesAsCertain: false
+    paths:
+        - app/
+
+    # Level 10 is the highest level
+    level: max
+
+    ignoreErrors:
+        # HasFactory generic type - Laravel не має типізованих factories
+        - '#Class .+ uses generic trait .+HasFactory but does not specify its types#'

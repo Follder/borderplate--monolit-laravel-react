@@ -1,0 +1,52 @@
+services:
+  db:
+    image: mysql:8.0
+    platform: linux/x86_64
+    container_name: yaremche-db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: 'example'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'root'
+    volumes:
+      - ./storage/docker/db:/var/lib/mysql
+    networks:
+      - yaremche-db-network
+
+  app:
+    build:
+      context: ./
+      dockerfile: ./docker/php/Dockerfile
+    container_name: yaremche-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+      - ./docker/php/extend-php.ini:/usr/local/etc/php/conf.d/extend-php.ini
+    ports:
+      - "5173:5173"
+    depends_on:
+      - db
+    networks:
+      - yaremche-db-network
+      - yaremche-webserver-network
+
+  webserver:
+    image: nginx:1.21.4-alpine
+    container_name: yaremche-webserver
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./storage/docker/logs/nginx/:/var/log/nginx/
+    ports:
+      - "80:80"
+    networks:
+      - yaremche-webserver-network
+
+networks:
+  yaremche-db-network:
+  yaremche-webserver-network:
