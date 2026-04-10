@@ -33,7 +33,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           source: "public/build"
-          target: "~/${{ secrets.STAGE_PATH }}"
+          target: "~/${{ secrets.DEV_PATH }}"
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
