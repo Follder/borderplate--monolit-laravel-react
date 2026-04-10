@@ -1,0 +1,61 @@
+name: Deploy to Dev
+
+on:
+  push:
+    branches:
+      - stage
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Copy build to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "public/build"
+          target: "~/${{ secrets.STAGE_PATH }}"
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            cd ~/${{ secrets.DEV_PATH }}
+
+            echo "⬇️ Pulling changes..."
+            git pull origin stage
+
+            echo "📦 Installing dependencies..."
+            /usr/bin/php8.3 /usr/local/bin/composer install --no-dev --optimize-autoloader --no-interaction
+
+            echo "🔧 Laravel optimizations..."
+            /usr/bin/php8.3 artisan migrate --force
+            /usr/bin/php8.3 artisan config:cache
+            /usr/bin/php8.3 artisan route:cache
+            /usr/bin/php8.3 artisan view:cache
+
+            echo "✅ Deployed to dev.chuhaister.com"

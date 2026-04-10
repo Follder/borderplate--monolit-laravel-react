@@ -56,6 +56,21 @@ composer install
 php artisan key:generate
 php artisan migrate
 php artisan storage:link
+
+# Додати файли .gitignore з вмістом
+*
+!.gitignore
+
+# Додаємо структуру storage для git
+git add -f storage/app/private/.gitignore
+git add -f storage/app/public/.gitignore
+git add -f storage/framework/sessions/.gitignore
+git add -f storage/framework/views/.gitignore
+git add -f storage/framework/testing/.gitignore
+git add -f storage/framework/cache/.gitignore
+git add -f storage/logs/.gitignore
+git commit -m "Add storage directory structure"
+
 npm install
 npm run build
 ```
@@ -158,3 +173,27 @@ database/
 ├── seeders/           # Seeders
 └── factories/         # Factories
 ```
+
+### Деплой проекту
+
+## Створення ключа
+
+```bash
+# Генеруємо ключ локально в терміналі
+ssh-keygen -t ed25519 -C "github-deploy" -f ~/.ssh/github_deploy
+```
+
+# Отримаєш два файли:
+~/.ssh/github_deploy — приватний ключ (в GitHub)
+~/.ssh/github_deploy.pub — публічний ключ (на сервер)
+
+## Заходь в репозиторій → Settings → Secrets and variables → Actions і додаєм
+
+# SSH_PRIVATE_KEY
+вміст файлу ~/.ssh/github_deploy (приватний ключ)
+
+# SSH_HOST
+IP адреса VPS
+
+# SSH_USER
+deployer
