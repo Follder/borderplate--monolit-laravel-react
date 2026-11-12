@@ -1,3 +1,4 @@
+
 services:
   db:
     image: mysql:8.0
@@ -26,8 +27,6 @@ services:
     volumes:
       - ./:/var/www
       - ./docker/php/extend-php.ini:/usr/local/etc/php/conf.d/extend-php.ini
-    ports:
-      - "5173:5173"
     depends_on:
       - db
     networks:
@@ -35,7 +34,7 @@ services:
       - webserver-network
 
   webserver:
-    image: nginx:1.21.4-alpine
+    image: nginx:alpine
     container_name: ${CONTAINER_NAME}-webserver
     restart: unless-stopped
     volumes:

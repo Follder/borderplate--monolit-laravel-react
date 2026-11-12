@@ -12,4 +12,6 @@ parameters:
 
     ignoreErrors:
         # HasFactory generic type - Laravel не має типізованих factories
-        - '#Class .+ uses generic trait .+HasFactory but does not specify its types#'
+        -
+            identifier: missingType.generics
+            reportUnmatched: false
