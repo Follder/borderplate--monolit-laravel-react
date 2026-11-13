@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SeasonType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -9,7 +10,7 @@ class ProductPrice extends Model
 {
     protected $fillable = [
         'product_id',
-        'season_id',
+        'season_type',
         'price',
         'additional_price',
     ];
@@ -17,6 +18,7 @@ class ProductPrice extends Model
     protected function casts(): array
     {
         return [
+            'season_type' => SeasonType::class,
             'price' => 'integer',
             'additional_price' => 'integer',
         ];
@@ -27,10 +29,5 @@ class ProductPrice extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
-    }
-
-    public function season(): BelongsTo
-    {
-        return $this->belongsTo(Season::class);
     }
 }

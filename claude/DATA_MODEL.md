@@ -146,19 +146,21 @@ enum SeasonType: int
 
 ### product_prices
 
-Ціни продуктів по сезонах.
+Ціни продуктів по типах сезонів.
 
 | Поле | Тип | Опис |
 |------|-----|------|
 | id | bigint | PK |
 | product_id | bigint, FK → products | Продукт |
-| season_id | bigint, FK → seasons | Сезон |
-| price | int | Базова ціна (в копійках або грн) |
+| season_type | tinyint | 1=low, 2=high, 3=holiday |
+| price | int | Базова ціна (грн) |
 | additional_price | int | Ціна за додаткового учня |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-**Unique:** product_id + season_id
+**Unique:** product_id + season_type
+
+**Примітка:** Ціна прив'язана до типу сезону, а не до конкретного сезону. Таблиця `seasons` визначає лише періоди (дати).
 
 ---
 
@@ -227,25 +229,20 @@ Student::orderStudents() → hasMany(OrderStudent::class)
 Student::orders() → belongsToMany(Order::class, 'order_students')
 
 // Season
-Season::productPrices() → hasMany(ProductPrice::class)
-Season::products() → belongsToMany(Product::class, 'product_prices')
+// Немає зв'язків з ProductPrice (ціни прив'язані до season_type, не season_id)
 
 // Product
 Product::productPrices() → hasMany(ProductPrice::class)
-Product::seasons() → belongsToMany(Season::class, 'product_prices')
+Product::orders() → hasMany(Order::class)
 
 // ProductPrice
 ProductPrice::product() → belongsTo(Product::class)
-ProductPrice::season() → belongsTo(Season::class)
 
 // Order
 Order::user() → belongsTo(User::class)
 Order::product() → belongsTo(Product::class)
 Order::orderStudents() → hasMany(OrderStudent::class)
 Order::students() → belongsToMany(Student::class, 'order_students')
-
-// Product (додаємо)
-Product::orders() → hasMany(Order::class)
 
 // OrderStudent
 OrderStudent::order() → belongsTo(Order::class)
