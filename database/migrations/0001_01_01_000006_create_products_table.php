@@ -14,6 +14,9 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->tinyInteger('hours');
+            $table->tinyInteger('max_persons')->default(4);
+            $table->tinyInteger('min_age')->nullable();
+            $table->tinyInteger('max_age')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

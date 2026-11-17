@@ -15,10 +15,13 @@ return new class extends Migration
             $table->date('lesson_date');
             $table->tinyInteger('hours');
             $table->unsignedInteger('base_price');
-            $table->unsignedInteger('extra_student_price');
+            $table->unsignedInteger('extra_person_price');
             $table->unsignedInteger('total_price');
             $table->tinyInteger('status')->default(1);
             $table->string('payment_id')->nullable();
+            $table->string('payment_url')->nullable();
+            $table->string('ticket_url')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
 
             $table->index('user_id');

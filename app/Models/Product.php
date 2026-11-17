@@ -12,6 +12,9 @@ class Product extends Model
         'title',
         'description',
         'hours',
+        'max_persons',
+        'min_age',
+        'max_age',
         'is_active',
     ];
 
@@ -19,6 +22,9 @@ class Product extends Model
     {
         return [
             'hours' => 'integer',
+            'max_persons' => 'integer',
+            'min_age' => 'integer',
+            'max_age' => 'integer',
             'is_active' => 'boolean',
         ];
     }

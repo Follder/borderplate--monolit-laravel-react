@@ -16,10 +16,13 @@ class Order extends Model
         'lesson_date',
         'hours',
         'base_price',
-        'extra_student_price',
+        'extra_person_price',
         'total_price',
         'status',
         'payment_id',
+        'payment_url',
+        'ticket_url',
+        'notes',
     ];
 
     protected function casts(): array
@@ -28,7 +31,7 @@ class Order extends Model
             'lesson_date' => 'date',
             'hours' => 'integer',
             'base_price' => 'integer',
-            'extra_student_price' => 'integer',
+            'extra_person_price' => 'integer',
             'total_price' => 'integer',
             'status' => OrderStatus::class,
         ];
@@ -46,14 +49,14 @@ class Order extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function orderStudents(): HasMany
+    public function orderPersons(): HasMany
     {
-        return $this->hasMany(OrderStudent::class);
+        return $this->hasMany(OrderPerson::class);
     }
 
-    public function students(): BelongsToMany
+    public function persons(): BelongsToMany
     {
-        return $this->belongsToMany(Student::class, 'order_students')
+        return $this->belongsToMany(Person::class, 'order_persons')
             ->withPivot(['price', 'is_primary', 'receipt_url']);
     }
 }

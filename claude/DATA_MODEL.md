@@ -3,13 +3,13 @@
 ## Діаграма зв'язків
 
 ```
-users (клієнти)
+users (клієнти/платники)
   │
-  ├── hasMany → students (учні)
+  ├── hasMany → persons (учасники занять)
   │               │
   └── hasMany → orders (замовлення) ← belongsTo products
                   │
-                  └── hasMany → order_students ← belongsTo students
+                  └── hasMany → order_persons ← belongsTo persons
 
 products
   │
@@ -67,9 +67,9 @@ enum AdminRole: int
 
 ---
 
-### students
+### persons
 
-Учні (ті, хто катається).
+Учасники занять (ті, хто катається).
 
 | Поле | Тип | Опис |
 |------|-----|------|
@@ -79,6 +79,7 @@ enum AdminRole: int
 | phone | string, nullable | Телефон (nullable для дітей) |
 | birth_date | date | Дата народження |
 | skill_level | tinyint | 1=beginner, 2=novice, 3=intermediate, 4=pro |
+| sex | tinyint | 1=male, 2=female |
 | lessons_count | int, default 0 | Кількість відкатаних занять |
 | created_at | timestamp | |
 | updated_at | timestamp | |
@@ -90,6 +91,12 @@ enum SkillLevel: int
     case Novice = 2;       // Новачок
     case Intermediate = 3; // Умілий
     case Pro = 4;          // Профі
+}
+
+enum Sex: int
+{
+    case Male = 1;    // Чоловіча
+    case Female = 2;  // Жіноча
 }
 ```
 
@@ -138,6 +145,9 @@ enum SeasonType: int
 | title | string | Назва для фронту |
 | description | text, nullable | Опис |
 | hours | tinyint | Кількість годин (1-8) |
+| max_persons | tinyint, default 4 | Максимум учасників |
+| min_age | tinyint, nullable | Мінімальний вік |
+| max_age | tinyint, nullable | Максимальний вік |
 | is_active | boolean, default true | Чи активний |
 | created_at | timestamp | |
 | updated_at | timestamp | |
@@ -154,7 +164,7 @@ enum SeasonType: int
 | product_id | bigint, FK → products | Продукт |
 | season_type | tinyint | 1=low, 2=high, 3=holiday |
 | price | int | Базова ціна (грн) |
-| additional_price | int | Ціна за додаткового учня |
+| additional_price | int | Ціна за додаткового учасника |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
@@ -176,10 +186,13 @@ enum SeasonType: int
 | lesson_date | date | Дата заняття |
 | hours | tinyint | Кількість годин (snapshot) |
 | base_price | int | Snapshot базової ціни |
-| extra_student_price | int | Snapshot ціни за додаткового учня |
+| extra_person_price | int | Snapshot ціни за додаткового учасника |
 | total_price | int | Загальна сума |
 | status | tinyint | 1=pending, 2=paid, 3=completed, 4=cancelled, 5=refunded |
 | payment_id | string, nullable | ID платежу MonoPay |
+| payment_url | string, nullable | URL для оплати MonoPay |
+| ticket_url | string, nullable | URL PDF квитка/підтвердження |
+| notes | text, nullable | Коментарі клієнта |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
@@ -196,17 +209,17 @@ enum OrderStatus: int
 
 ---
 
-### order_students
+### order_persons
 
-Учні в замовленні (pivot).
+Учасники в замовленні (pivot).
 
 | Поле | Тип | Опис |
 |------|-----|------|
 | id | bigint | PK |
 | order_id | bigint, FK → orders | Замовлення |
-| student_id | bigint, FK → students | Учень |
-| price | int | Ціна за цього учня |
-| is_primary | boolean | Перший учень (повна ціна) чи додатковий |
+| person_id | bigint, FK → persons | Учасник |
+| price | int | Ціна за цього учасника |
+| is_primary | boolean | Перший учасник (повна ціна) чи додатковий |
 | receipt_url | string, nullable | URL фіскального чеку |
 | created_at | timestamp | |
 | updated_at | timestamp | |
@@ -220,13 +233,13 @@ enum OrderStatus: int
 Admin::class — немає зв'язків
 
 // User
-User::students() → hasMany(Student::class)
+User::persons() → hasMany(Person::class)
 User::orders() → hasMany(Order::class)
 
-// Student
-Student::user() → belongsTo(User::class)
-Student::orderStudents() → hasMany(OrderStudent::class)
-Student::orders() → belongsToMany(Order::class, 'order_students')
+// Person
+Person::user() → belongsTo(User::class)
+Person::orderPersons() → hasMany(OrderPerson::class)
+Person::orders() → belongsToMany(Order::class, 'order_persons')
 
 // Season
 // Немає зв'язків з ProductPrice (ціни прив'язані до season_type, не season_id)
@@ -241,12 +254,12 @@ ProductPrice::product() → belongsTo(Product::class)
 // Order
 Order::user() → belongsTo(User::class)
 Order::product() → belongsTo(Product::class)
-Order::orderStudents() → hasMany(OrderStudent::class)
-Order::students() → belongsToMany(Student::class, 'order_students')
+Order::orderPersons() → hasMany(OrderPerson::class)
+Order::persons() → belongsToMany(Person::class, 'order_persons')
 
-// OrderStudent
-OrderStudent::order() → belongsTo(Order::class)
-OrderStudent::student() → belongsTo(Student::class)
+// OrderPerson
+OrderPerson::order() → belongsTo(Order::class)
+OrderPerson::person() → belongsTo(Person::class)
 ```
 
 ---
@@ -255,12 +268,12 @@ OrderStudent::student() → belongsTo(Student::class)
 
 - `users.email` — unique
 - `admins.email` — unique
-- `students.user_id` — index
-- `product_prices.product_id + season_id` — unique
+- `persons.user_id` — index
+- `product_prices.product_id + season_type` — unique
 - `orders.user_id` — index
 - `orders.product_id` — index
 - `orders.status` — index
 - `orders.lesson_date` — index
-- `order_students.order_id` — index
-- `order_students.student_id` — index
+- `order_persons.order_id` — index
+- `order_persons.person_id` — index
 - `seasons.date_from, date_to` — index (для пошуку сезону по даті)

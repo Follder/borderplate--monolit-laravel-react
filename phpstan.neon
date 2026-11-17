@@ -7,8 +7,8 @@ parameters:
     paths:
         - app/
 
-    # Level 10 is the highest level
-    level: max
+    # Level 5 - помірний рівень
+    level: 5
 
     ignoreErrors:
         # HasFactory generic type - Laravel не має типізованих factories

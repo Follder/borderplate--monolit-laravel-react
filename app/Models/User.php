@@ -35,9 +35,9 @@ class User extends Authenticatable
 
     // Relationships
 
-    public function students(): HasMany
+    public function persons(): HasMany
     {
-        return $this->hasMany(Student::class);
+        return $this->hasMany(Person::class);
     }
 
     public function orders(): HasMany
