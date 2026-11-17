@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('order_persons', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('person_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('person_id')->constrained('persons')->cascadeOnDelete();
             $table->unsignedInteger('price');
             $table->boolean('is_primary')->default(false);
             $table->string('receipt_url')->nullable();

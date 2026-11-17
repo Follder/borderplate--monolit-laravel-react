@@ -54,6 +54,27 @@ class ProductResource extends Resource
                     ->minValue(1)
                     ->maxValue(8),
 
+                TextInput::make('max_persons')
+                    ->label('Максимум учасників')
+                    ->numeric()
+                    ->default(4)
+                    ->minValue(1)
+                    ->maxValue(10),
+
+                TextInput::make('min_age')
+                    ->label('Мінімальний вік')
+                    ->numeric()
+                    ->minValue(3)
+                    ->maxValue(99)
+                    ->placeholder('Без обмежень'),
+
+                TextInput::make('max_age')
+                    ->label('Максимальний вік')
+                    ->numeric()
+                    ->minValue(3)
+                    ->maxValue(99)
+                    ->placeholder('Без обмежень'),
+
                 Textarea::make('description')
                     ->label('Опис')
                     ->rows(3)
@@ -76,6 +97,10 @@ class ProductResource extends Resource
                 TextColumn::make('hours')
                     ->label('Години')
                     ->suffix(' год')
+                    ->sortable(),
+
+                TextColumn::make('max_persons')
+                    ->label('Макс. учасників')
                     ->sortable(),
 
                 IconColumn::make('is_active')

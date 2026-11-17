@@ -26,6 +26,8 @@ use Illuminate\Support\Carbon;
  */
 class Person extends Model
 {
+    protected $table = 'persons';
+
     protected $fillable = [
         'user_id',
         'first_name',
